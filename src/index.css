@@ -1,0 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer base {
+  :root {
+    --color-charcoal: #121417;
+    --color-slate-dark: #1A1D20;
+    --color-red: #E50914;
+    --color-gold: #F5A623;
+    --color-offwhite: #F8F9FA;
+  }
+}
+
+/* Tech grid overlay */
+.tech-grid {
+  background-image:
+    linear-gradient(rgba(229, 9, 20, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(229, 9, 20, 0.06) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* Fade-in-up animation */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+  will-change: opacity, transform;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* WhatsApp pulse */
+@keyframes wa-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.5); }
+  70% { box-shadow: 0 0 0 16px rgba(37, 211, 102, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+}
+
+.wa-pulse {
+  animation: wa-pulse 2s infinite;
+}
+
+/* Card hover lift */
+.lift-card {
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+.lift-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.35);
+}
+
+/* Frosted glass header */
+.frosted {
+  background: rgba(18, 20, 23, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+/* Subtle gold accent */
+.gold-dot {
+  background: #F5A623;
+}
+
+/* Marquee for brands strip */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.marquee-track {
+  animation: marquee 28s linear infinite;
+}
