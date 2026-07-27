@@ -449,14 +449,12 @@ function Contact() {
     const service = String(formData.get('service') || '').trim();
     const message = String(formData.get('message') || '').trim();
 
-    // 1. Validation: ONLY check Name, Phone, and Service (Message is OPTIONAL)
     if (!name || !phone || !service) {
       setErrorMessage('Please fill in your Name, Phone Number, and select a Service.');
       setStatus('error');
       return;
     }
 
-    // 2. Try saving to Supabase safely (if available), but continue even if it fails
     try {
       await supabase.from('quote_requests').insert({
         name,
@@ -465,14 +463,12 @@ function Contact() {
         message: message || null,
       });
     } catch (err) {
-      console.log('Supabase bypassed or offline:', err);
+      console.log('Supabase bypassed:', err);
     }
 
-    // 3. Set state to Success and reset the form
     setStatus('success');
     formRef.current?.reset();
 
-    // 4. Send the Lead directly to WhatsApp
     const lines = [
       `*New Quote Request — Mgama Tech*`,
       ``,
@@ -480,8 +476,7 @@ function Contact() {
       `*Phone:* ${phone}`,
       `*Service Required:* ${service}`,
     ];
-    
-    // Add optional message if the user provided one
+
     if (message) {
       lines.push(`*Message:* ${message}`);
     }
@@ -490,7 +485,6 @@ function Contact() {
     const text = encodeURIComponent(lines.join('\n'));
     const whatsappUrl = `https://wa.me/${WHATSAPP}?text=${text}`;
 
-    // Open WhatsApp with the pre-filled message
     window.open(whatsappUrl, '_blank');
   };
 
@@ -602,263 +596,6 @@ export default function App() {
       <Showroom />
       <WhyUs />
       <Contact />
-    </div>
-  );
-}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">
-                Phone Number <span className="text-[#E50914]">*</span>
-              </label>
-              <input
-                type="tel"
-                name="phone"
-                required
-                placeholder="e.g. 0742 272 749"
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-gray-500 focus:border-[#E50914] focus:outline-none focus:ring-1 focus:ring-[#E50914]"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">
-                Service Required <span className="text-[#E50914]">*</span>
-              </label>
-              <select
-                name="service"
-                required
-                defaultValue=""
-                className="w-full rounded-xl border border-white/10 bg-[#1A1D20] px-4 py-3 text-white focus:border-[#E50914] focus:outline-none focus:ring-1 focus:ring-[#E50914]"
-              >
-                <option value="" disabled>Select a service...</option>
-                {SERVICES.map((s) => (
-                  <option key={s.title} value={s.title}>
-                    {s.title}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">
-                Message / Details <span className="text-gray-500 text-xs">(Optional)</span>
-              </label>
-              <textarea
-                name="message"
-                rows={3}
-                placeholder="Write any extra details here if you like (optional)..."
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-gray-500 focus:border-[#E50914] focus:outline-none focus:ring-1 focus:ring-[#E50914]"
-              />
-            </div>
-
-            {status === 'error' && (
-              <div className="rounded-xl bg-red-500/10 border border-red-500/30 p-3 text-sm text-red-300">
-                {errorMessage || 'Please fill in all required fields and try again.'}
-              </div>
-            )}
-
-            {status === 'success' && (
-              <div className="rounded-xl bg-green-500/10 border border-green-500/30 p-3 text-sm text-green-300">
-                Thank you! Redirecting to WhatsApp...
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={status === 'submitting'}
-              className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#E50914] px-6 py-4 text-base font-semibold text-white shadow-lg shadow-red-900/40 hover:bg-red-600 transition-all hover:scale-[1.01] disabled:opacity-50"
-            >
-              <Send className="h-5 w-5" />
-              {status === 'submitting' ? 'Submitting...' : 'Submit Request'}
-            </button>
-          </form>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-export default function App() {
-  useReveal();
-  return (
-    <div className="min-h-screen bg-[#121417] text-white selection:bg-[#E50914] selection:text-white">
-      <Header onNavClick={() => {}} />
-      <Hero />
-      <Services />
-      <Brands />
-      <Showroom />
-      <WhyUs />
-      <Contact />
-    </div>
-  );
-}
-              </a>
-
-              <div className="flex items-start gap-4">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/5 border border-white/10">
-                  <Clock className="h-5 w-5 text-[#E50914]" />
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500 uppercase tracking-wide">Operating Hours</p>
-                  <p className="text-white font-medium">Mon–Fri: 8:00 AM – 6:00 PM</p>
-                  <p className="text-gray-400 text-sm">Sat: 8:30 AM – 4:00 PM · Sun: Closed</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="reveal">
-            <form
-              ref={formRef}
-              onSubmit={handleSubmit}
-              className="rounded-2xl bg-[#1A1D20] border border-white/10 p-6 sm:p-8 shadow-2xl"
-            >
-              <h3 className="text-xl font-bold text-white mb-6">Request a Free Quote</h3>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1.5">Name</label>
-                  <input
-                    name="name"
-                    type="text"
-                    required
-                    placeholder="Your full name"
-                    className="w-full rounded-lg bg-[#121417] border border-white/10 px-4 py-3 text-white placeholder-gray-500 focus:border-[#E50914] focus:ring-1 focus:ring-[#E50914] outline-none transition-colors"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1.5">Phone Number</label>
-                  <input
-                    name="phone"
-                    type="tel"
-                    required
-                    placeholder="+255 ..."
-                    className="w-full rounded-lg bg-[#121417] border border-white/10 px-4 py-3 text-white placeholder-gray-500 focus:border-[#E50914] focus:ring-1 focus:ring-[#E50914] outline-none transition-colors"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1.5">Service Required</label>
-                  <select
-                    name="service"
-                    required
-                    defaultValue=""
-                    className="w-full rounded-lg bg-[#121417] border border-white/10 px-4 py-3 text-white focus:border-[#E50914] focus:ring-1 focus:ring-[#E50914] outline-none transition-colors"
-                  >
-                    <option value="" disabled>Select a service</option>
-                    <option>CCTV Installation</option>
-                    <option>Gate Motor Sales / Repair</option>
-                    <option>Electric Fencing</option>
-                    <option>Alarm & Access Control</option>
-                    <option>Other</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1.5">Message</label>
-                  <textarea
-                    name="message"
-                    rows={4}
-                    placeholder="Tell us about your project or requirements..."
-                    className="w-full rounded-lg bg-[#121417] border border-white/10 px-4 py-3 text-white placeholder-gray-500 focus:border-[#E50914] focus:ring-1 focus:ring-[#E50914] outline-none transition-colors resize-none"
-                  />
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={status === 'submitting'}
-                className="mt-6 w-full inline-flex items-center justify-center gap-2 rounded-full bg-[#E50914] px-6 py-4 text-base font-semibold text-white shadow-lg shadow-red-900/30 hover:bg-red-600 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {status === 'submitting' ? 'Sending...' : (
-                  <>
-                    <Send className="h-5 w-5" />
-                    Submit Request
-                  </>
-                )}
-              </button>
-
-              {status === 'success' && (
-                <p className="mt-4 rounded-lg bg-green-500/10 border border-green-500/30 px-4 py-3 text-sm text-green-300">
-                  Thank you! Your request has been received. We'll contact you shortly.
-                </p>
-              )}
-              {status === 'error' && (
-                <p className="mt-4 rounded-lg bg-red-500/10 border border-red-500/30 px-4 py-3 text-sm text-red-300">
-                  Please fill in all required fields and try again.
-                </p>
-              )}
-            </form>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Footer() {
-  return (
-    <footer className="bg-[#0A0B0D] border-t border-white/5 py-12">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#E50914]">
-              <ShieldCheck className="h-5 w-5 text-white" strokeWidth={2.5} />
-            </div>
-            <div className="flex flex-col leading-none">
-              <span className="text-base font-extrabold text-white">
-                Mgama<span className="text-[#E50914]"> Tech</span>
-              </span>
-              <span className="text-[11px] text-gray-500">Innovation · Quality · Security</span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-6 text-sm text-gray-400">
-            <a href={WA_LINK} target="_blank" rel="noopener noreferrer" className="hover:text-[#E50914] transition-colors">@mgamatech_tz</a>
-            <a href={`tel:${PHONE_TEL}`} className="hover:text-[#E50914] transition-colors">{PHONE}</a>
-            <a href={`mailto:${EMAIL}`} className="hover:text-[#E50914] transition-colors">Email</a>
-          </div>
-        </div>
-
-        <div className="mt-8 pt-6 border-t border-white/5 text-center text-sm text-gray-500">
-          <p>© {new Date().getFullYear()} Mgama Tech. All rights reserved. · Goba Njia Nne, Dar es Salaam</p>
-        </div>
-      </div>
-    </footer>
-  );
-}
-
-function WhatsAppButton() {
-  return (
-    <a
-      href={WA_LINK}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label="Chat on WhatsApp"
-      className="wa-pulse fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] shadow-xl hover:scale-110 transition-transform"
-    >
-      <svg viewBox="0 0 24 24" className="h-7 w-7 fill-white" aria-hidden="true">
-        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.89-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-      </svg>
-    </a>
-  );
-}
-
-export default function App() {
-  useReveal();
-
-  return (
-    <div className="min-h-screen bg-[#121417]">
-      <Header onNavClick={() => {}} />
-      <main>
-        <Hero />
-        <Services />
-        <Brands />
-        <Showroom />
-        <WhyUs />
-        <Contact />
-      </main>
-      <Footer />
-      <WhatsAppButton />
     </div>
   );
 }
