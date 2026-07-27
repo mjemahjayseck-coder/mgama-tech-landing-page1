@@ -435,37 +435,44 @@ function WhyUs() {
 
 function Contact() {
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
   const formRef = useRef<HTMLFormElement>(null);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setStatus('submitting');
+    setErrorMessage('');
+
     const formData = new FormData(e.currentTarget);
     const name = String(formData.get('name') || '').trim();
     const phone = String(formData.get('phone') || '').trim();
     const service = String(formData.get('service') || '').trim();
     const message = String(formData.get('message') || '').trim();
 
+    // 1. Validation: ONLY check Name, Phone, and Service (Message is OPTIONAL)
     if (!name || !phone || !service) {
+      setErrorMessage('Please fill in your Name, Phone Number, and select a Service.');
       setStatus('error');
       return;
     }
 
-    const { error } = await supabase.from('quote_requests').insert({
-      name,
-      phone,
-      service,
-      message: message || null,
-    });
-
-    if (error) {
-      setStatus('error');
-      return;
+    // 2. Try saving to Supabase safely (if available), but continue even if it fails
+    try {
+      await supabase.from('quote_requests').insert({
+        name,
+        phone,
+        service,
+        message: message || null,
+      });
+    } catch (err) {
+      console.log('Supabase bypassed or offline:', err);
     }
+
+    // 3. Set state to Success and reset the form
     setStatus('success');
     formRef.current?.reset();
 
-    // Build a pre-filled WhatsApp message and open it
+    // 4. Send the Lead directly to WhatsApp
     const lines = [
       `*New Quote Request — Mgama Tech*`,
       ``,
@@ -473,52 +480,216 @@ function Contact() {
       `*Phone:* ${phone}`,
       `*Service Required:* ${service}`,
     ];
+    
+    // Add optional message if the user provided one
     if (message) {
       lines.push(`*Message:* ${message}`);
     }
-    lines.push(``, `_Sent from mgamatech.co_`);
+    lines.push(``, `_Sent from mgamatech.netlify.app_`);
+
     const text = encodeURIComponent(lines.join('\n'));
-    window.open(`${WA_LINK}?text=${text}`, '_blank', 'noopener,noreferrer');
+    const whatsappUrl = `https://wa.me/${WHATSAPP}?text=${text}`;
+
+    // Open WhatsApp with the pre-filled message
+    window.open(whatsappUrl, '_blank');
   };
 
   return (
-    <section id="contact" className="bg-[#121417] py-20 sm:py-28 relative overflow-hidden">
-      <div className="absolute inset-0 tech-grid opacity-30" />
-      <div className="absolute -left-20 top-1/3 h-72 w-72 rounded-full bg-[#E50914]/10 blur-[100px]" />
+    <section id="contact" className="bg-[#121417] py-20 sm:py-28 text-white relative">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="max-w-2xl mx-auto text-center mb-12">
+          <p className="reveal text-sm font-bold uppercase tracking-widest text-[#E50914]">Get In Touch</p>
+          <h2 className="reveal mt-3 text-3xl sm:text-4xl font-extrabold tracking-tight">Request A Free Quote</h2>
+          <p className="reveal mt-4 text-gray-400">
+            Fill out the details below and we will contact you immediately on WhatsApp or Phone.
+          </p>
+        </div>
 
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14">
-          <div>
-            <p className="reveal text-sm font-bold uppercase tracking-widest text-[#E50914]">Get In Touch</p>
-            <h2 className="reveal mt-3 text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-              Contact & Location
-            </h2>
-            <p className="reveal mt-4 text-lg text-gray-400 leading-relaxed">
-              Ready to secure your property? Request a free quote or visit our showroom in Goba Njia Nne.
-            </p>
+        <div className="max-w-xl mx-auto bg-white/5 border border-white/10 rounded-2xl p-6 sm:p-8 backdrop-blur-md shadow-2xl">
+          <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                Full Name <span className="text-[#E50914]">*</span>
+              </label>
+              <input
+                type="text"
+                name="name"
+                required
+                placeholder="e.g. John Doe"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-gray-500 focus:border-[#E50914] focus:outline-none focus:ring-1 focus:ring-[#E50914]"
+              />
+            </div>
 
-            <div className="reveal mt-8 space-y-5">
-              <a href={MAPS_LINK} target="_blank" rel="noopener noreferrer" className="flex items-start gap-4 group">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/5 border border-white/10 group-hover:border-[#E50914]/40 transition-colors">
-                  <MapPin className="h-5 w-5 text-[#E50914]" />
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500 uppercase tracking-wide">Location</p>
-                  <p className="text-white font-medium group-hover:text-[#E50914] transition-colors">
-                    Goba Njia Nne (Madale Road), Dar es Salaam
-                  </p>
-                  <p className="text-sm text-gray-500 mt-0.5">Click to open in Google Maps</p>
-                </div>
-              </a>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                Phone Number <span className="text-[#E50914]">*</span>
+              </label>
+              <input
+                type="tel"
+                name="phone"
+                required
+                placeholder="e.g. 0742 272 749"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-gray-500 focus:border-[#E50914] focus:outline-none focus:ring-1 focus:ring-[#E50914]"
+              />
+            </div>
 
-              <a href={`mailto:${EMAIL}`} className="flex items-center gap-4 group">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/5 border border-white/10 group-hover:border-[#E50914]/40 transition-colors">
-                  <Mail className="h-5 w-5 text-[#E50914]" />
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500 uppercase tracking-wide">Email</p>
-                  <p className="text-white font-medium group-hover:text-[#E50914] transition-colors">{EMAIL}</p>
-                </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                Service Required <span className="text-[#E50914]">*</span>
+              </label>
+              <select
+                name="service"
+                required
+                defaultValue=""
+                className="w-full rounded-xl border border-white/10 bg-[#1A1D20] px-4 py-3 text-white focus:border-[#E50914] focus:outline-none focus:ring-1 focus:ring-[#E50914]"
+              >
+                <option value="" disabled>Select a service...</option>
+                {SERVICES.map((s) => (
+                  <option key={s.title} value={s.title}>
+                    {s.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                Message / Details <span className="text-gray-500 text-xs">(Optional)</span>
+              </label>
+              <textarea
+                name="message"
+                rows={3}
+                placeholder="Write any extra details here if you like (optional)..."
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-gray-500 focus:border-[#E50914] focus:outline-none focus:ring-1 focus:ring-[#E50914]"
+              />
+            </div>
+
+            {status === 'error' && (
+              <div className="rounded-xl bg-red-500/10 border border-red-500/30 p-3 text-sm text-red-300">
+                {errorMessage || 'Please fill in all required fields and try again.'}
+              </div>
+            )}
+
+            {status === 'success' && (
+              <div className="rounded-xl bg-green-500/10 border border-green-500/30 p-3 text-sm text-green-300">
+                Thank you! Redirecting to WhatsApp...
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={status === 'submitting'}
+              className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#E50914] px-6 py-4 text-base font-semibold text-white shadow-lg shadow-red-900/40 hover:bg-red-600 transition-all hover:scale-[1.01] disabled:opacity-50"
+            >
+              <Send className="h-5 w-5" />
+              {status === 'submitting' ? 'Submitting...' : 'Submit Request'}
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export default function App() {
+  useReveal();
+  return (
+    <div className="min-h-screen bg-[#121417] text-white selection:bg-[#E50914] selection:text-white">
+      <Header onNavClick={() => {}} />
+      <Hero />
+      <Services />
+      <Brands />
+      <Showroom />
+      <WhyUs />
+      <Contact />
+    </div>
+  );
+}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                Phone Number <span className="text-[#E50914]">*</span>
+              </label>
+              <input
+                type="tel"
+                name="phone"
+                required
+                placeholder="e.g. 0742 272 749"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-gray-500 focus:border-[#E50914] focus:outline-none focus:ring-1 focus:ring-[#E50914]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                Service Required <span className="text-[#E50914]">*</span>
+              </label>
+              <select
+                name="service"
+                required
+                defaultValue=""
+                className="w-full rounded-xl border border-white/10 bg-[#1A1D20] px-4 py-3 text-white focus:border-[#E50914] focus:outline-none focus:ring-1 focus:ring-[#E50914]"
+              >
+                <option value="" disabled>Select a service...</option>
+                {SERVICES.map((s) => (
+                  <option key={s.title} value={s.title}>
+                    {s.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                Message / Details <span className="text-gray-500 text-xs">(Optional)</span>
+              </label>
+              <textarea
+                name="message"
+                rows={3}
+                placeholder="Write any extra details here if you like (optional)..."
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-gray-500 focus:border-[#E50914] focus:outline-none focus:ring-1 focus:ring-[#E50914]"
+              />
+            </div>
+
+            {status === 'error' && (
+              <div className="rounded-xl bg-red-500/10 border border-red-500/30 p-3 text-sm text-red-300">
+                {errorMessage || 'Please fill in all required fields and try again.'}
+              </div>
+            )}
+
+            {status === 'success' && (
+              <div className="rounded-xl bg-green-500/10 border border-green-500/30 p-3 text-sm text-green-300">
+                Thank you! Redirecting to WhatsApp...
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={status === 'submitting'}
+              className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#E50914] px-6 py-4 text-base font-semibold text-white shadow-lg shadow-red-900/40 hover:bg-red-600 transition-all hover:scale-[1.01] disabled:opacity-50"
+            >
+              <Send className="h-5 w-5" />
+              {status === 'submitting' ? 'Submitting...' : 'Submit Request'}
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export default function App() {
+  useReveal();
+  return (
+    <div className="min-h-screen bg-[#121417] text-white selection:bg-[#E50914] selection:text-white">
+      <Header onNavClick={() => {}} />
+      <Hero />
+      <Services />
+      <Brands />
+      <Showroom />
+      <WhyUs />
+      <Contact />
+    </div>
+  );
+}
               </a>
 
               <div className="flex items-start gap-4">
