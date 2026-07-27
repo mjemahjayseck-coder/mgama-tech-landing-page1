@@ -44,19 +44,19 @@ const SERVICES = [
     icon: Cctv,
     title: 'Hikvision CCTV Systems',
     desc: 'IP, ColorVu & NVR configuration with remote viewing, night vision and high-definition recording.',
-    image: 'https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&w=800&q=80',
+    image: '/cctv.jpeg',
   },
   {
     icon: DoorOpen,
     title: 'Automatic Gate Motors',
     desc: 'Gemini & Centurion sliding and swing gate motor sales, installation and professional repair.',
-    image: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80',
+    image: '/gate-motor.jpeg',
   },
   {
     icon: Zap,
     title: 'Electric Fencing & Razor Wire',
     desc: 'Perimeter energizers, high-security wiring and razor wire to protect homes and commercial sites.',
-    image: 'https://images.unsplash.com/photo-1508873696983-2df515122519?auto=format&fit=crop&w=800&q=80',
+    image: '/electric-fence.jpeg',
   },
   {
     icon: BellRing,
@@ -327,7 +327,7 @@ function Showroom() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-center">
           <div className="reveal relative rounded-2xl overflow-hidden shadow-2xl group">
             <img
-              src="https://images.unsplash.com/photo-1582139329536-e7284fece509?auto=format&fit=crop&w=1200&q=80"
+              src="/storefront.jpeg"
               alt="Mgama Tech Hikvision Shop - Goba Njia Nne"
               loading="lazy"
               className="w-full h-72 sm:h-96 object-cover transition-transform duration-500 group-hover:scale-105"
