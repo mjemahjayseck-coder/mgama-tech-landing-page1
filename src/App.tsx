@@ -70,7 +70,7 @@ const BRANDS = ['Hikvision', 'Gemini Automation', 'Centurion Systems', 'Nemtek']
 
 const WHY_US = [
   { icon: BadgeCheck, title: 'Certified Technicians', desc: 'Trained and certified installers for every product we supply.' },
-  { icon: ShieldCheck, title: 'Official Hardware Dealer', desc: 'Genuine Hikvision, Gemini, Centurion and Nemtek products only.' },
+  { icon: ShieldCheck, title: 'Official Hardware Dealer', desc: 'Genuine Hikvision, Gemini, Centurion and Nemtek products.' },
   { icon: Wrench, title: 'Fast Local Maintenance & Repair', desc: 'Rapid response maintenance and repair across Dar es Salaam.' },
   { icon: Wallet, title: 'Transparent Pricing', desc: 'Clear, upfront quotes with no hidden charges — ever.' },
 ];
@@ -378,8 +378,8 @@ function Showroom() {
                 </div>
                 <div>
                   <p className="text-xs text-gray-500 uppercase tracking-wide">Opening Hours</p>
-                  <p className="text-white font-medium">Mon–Fri: 8:00 AM – 6:00 PM</p>
-                  <p className="text-gray-400 text-sm">Sat: 8:30 AM – 4:00 PM · Sun: Closed</p>
+                  <p className="text-white font-medium">Mon–Sun: 8:00 AM – 8:30 PM</p>
+                  <p className="text-gray-400 text-sm">Open All Week</p>
                 </div>
               </div>
             </div>
